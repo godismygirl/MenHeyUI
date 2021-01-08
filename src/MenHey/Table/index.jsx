@@ -5,7 +5,7 @@ import style from './style.less';
 
 const MenHeyTable = ({
   columns,
-  rowKey,
+  rowKey = 'id',
   rowSelection,
   paginated,
   dataSource,
@@ -33,7 +33,7 @@ const MenHeyTable = ({
 
   const {
     url,
-    method,
+    method = 'GET',
     params,
     currentAlias,
     pageSizeAlias,
@@ -41,7 +41,7 @@ const MenHeyTable = ({
   } = dataSource;
 
   const service = ({ current, pageSize }) => {
-    const isGet = !method || (method && method.toUpperCase() === 'GET');
+    const isGet = method.toUpperCase() === 'GET';
     const requestParams = isGet ? 'params' : 'data';
     const aliasCurrent = currentAlias || 'current';
     const aliasPageSize = pageSizeAlias || 'pageSize';
@@ -66,25 +66,15 @@ const MenHeyTable = ({
   });
 
   const [selectRows, setSelectRows] = useState([]);
-
   const rowSelectionOption = rowSelection && {
     type: rowSelection,
     onChange: (selectedRowKeys, selectedRows) => {
       setSelectRows(selectedRows);
-      //   console.log(
-      //     `selectedRowKeys: ${selectedRowKeys}`,
-      //     'selectedRows: ',
-      //     selectedRows,
-      //   );
     },
     getCheckboxProps: record => ({
       defaultChecked: !!selectRows.find(row => row[rowKey] === record[rowKey]),
     }),
   };
-
-  // useEffect(() => {
-  //   setSelectRows;
-  // }, []);
 
   return (
     <div className={style.wrapper}>
