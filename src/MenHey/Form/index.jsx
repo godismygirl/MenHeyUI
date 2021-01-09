@@ -1,11 +1,18 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { Form, Row, Col, Button } from 'antd';
 import renderFormItem from './renderFormItem';
+import useMenHeyForm from './store';
 import style from './style.less';
 
-const MenHeyForm = ({ layout, cols, fields, buttons }) => {
-  //console.log(layout, cols, fields);
+const MenHeyForm = ({
+  layout = 'horizontal',
+  cols,
+  fields,
+  buttons,
+  onCreate,
+}) => {
   const [form] = Form.useForm();
+
   const colSpan = useMemo(() => {
     return Number.parseInt(24 / cols);
   }, [cols]);
@@ -25,6 +32,10 @@ const MenHeyForm = ({ layout, cols, fields, buttons }) => {
     });
     return groups;
   }, [fields, cols]);
+
+  useEffect(() => {
+    onCreate && onCreate(form);
+  }, []);
 
   return React.useMemo(
     () => (
@@ -73,3 +84,4 @@ MenHeyForm.defaultProps = {
 };
 
 export default MenHeyForm;
+export { useMenHeyForm };

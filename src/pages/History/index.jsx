@@ -4,6 +4,7 @@ import style from './style.less';
 import MenHeyForm from '@/MenHey/Form';
 import MenHeyTable from '@/MenHey/Table';
 import MenHeyBtn from '@/MenHey/Button';
+import { tableHeaders, tableButtons, remoteOption } from './config';
 
 const fieldConfig = [
   // {
@@ -98,119 +99,90 @@ const buttonConfig = [
   },
 ];
 
-const tableHeaders = [
-  {
-    title: '自查表名称',
-    dataIndex: 'fpostcheckmodel_name',
-    width: 250,
-  },
-  {
-    title: '自查项 ',
-    dataIndex: 'fcontent',
-    width: 250,
-    tooltip: true,
-  },
-  {
-    title: '自查频次',
-    dataIndex: 'fdic_name',
-    width: 250,
-    tooltip: true,
-  },
-  {
-    title: '自查情况',
-    dataIndex: 'fcheckstate',
-    width: 200,
-  },
-  {
-    title: '所属部门',
-    dataIndex: 'fsocialdepart_name',
-    width: 250,
-  },
-  {
-    title: '所属岗位',
-    dataIndex: 'fpost_name',
-    width: 250,
-  },
-  {
-    title: '自查人员',
-    dataIndex: 'fperson_name',
-    width: 180,
-    tooltip: true,
-  },
-  {
-    title: '联系电话',
-    dataIndex: 'fmobile_tel',
-    width: 180,
-  },
-  {
-    title: '计划开始时间',
-    dataIndex: 'fpstart_datefmt',
-    width: 180,
-  },
-  {
-    title: '计划结束时间',
-    dataIndex: 'fpend_datefmt',
-    width: 180,
-  },
-  {
-    title: '实际结束时间',
-    dataIndex: 'fend_time',
-    width: 180,
-  },
-];
+// const tableHeaders = [
+//   {
+//     title: '自查表名称',
+//     dataIndex: 'fpostcheckmodel_name',
+//     width: 250,
+//   },
+//   {
+//     title: '自查项 ',
+//     dataIndex: 'fcontent',
+//     width: 250,
+//     tooltip: true,
+//   },
+//   {
+//     title: '自查频次',
+//     dataIndex: 'fdic_name',
+//     width: 250,
+//     tooltip: true,
+//   },
+//   {
+//     title: '自查情况',
+//     dataIndex: 'fcheckstate',
+//     width: 200,
+//   },
+//   {
+//     title: '所属部门',
+//     dataIndex: 'fsocialdepart_name',
+//     width: 250,
+//   },
+//   {
+//     title: '所属岗位',
+//     dataIndex: 'fpost_name',
+//     width: 250,
+//   },
+//   {
+//     title: '自查人员',
+//     dataIndex: 'fperson_name',
+//     width: 180,
+//     tooltip: true,
+//   },
+//   {
+//     title: '联系电话',
+//     dataIndex: 'fmobile_tel',
+//     width: 180,
+//   },
+//   {
+//     title: '计划开始时间',
+//     dataIndex: 'fpstart_datefmt',
+//     width: 180,
+//   },
+//   {
+//     title: '计划结束时间',
+//     dataIndex: 'fpend_datefmt',
+//     width: 180,
+//   },
+//   {
+//     title: '实际结束时间',
+//     dataIndex: 'fend_time',
+//     width: 180,
+//   },
+// ];
 
-const remoteOption = {
-  url: '/API/wdk?action=obj.hdjobaction&method=getJobCheckRecordGride',
-  //method: 'post',
-  currentAlias: 'page',
-  pageSizeAlias: 'rows',
-  params: {
-    page: 1,
-    rows: 10,
-    fpost: '',
-    fperson: '',
-    fcheckmodeal: '',
-    beginDate: 20210101,
-    endDate: 20210131,
-    fcheckState: '',
-    orderbyfield: 'fpostchecktask_uuid',
-  },
-  formatResult: res => {
-    return {
-      list: res.rows.map((r, i) => ({ ...r, key: i })),
-      total: res.total,
-    };
-  },
-};
-
-const tableButtons = [
-  {
-    text: '新增',
-    icon: <ReloadOutlined />,
-    type: 'primary',
-    //danger: true,
-    // onClick: form => {
-    //   form.resetFields();
-    // },
-  },
-  {
-    text: '修改',
-    icon: <ReloadOutlined />,
-    type: 'primary',
-    //danger: true,
-    // onClick: form => {
-    //   form.resetFields();
-    // },
-  },
-  {
-    text: '删除',
-    type: 'primary',
-    danger: true,
-    // onClick: form => {
-    //   console.log('form', form);
-    // },
-  },
-];
+// const remoteOption = {
+//   url: '/API/wdk?action=obj.hdjobaction&method=getJobCheckRecordGride',
+//   //method: 'post',
+//   currentAlias: 'page',
+//   pageSizeAlias: 'rows',
+//   params: {
+//     page: 1,
+//     rows: 10,
+//     fpost: '',
+//     fperson: '',
+//     fcheckmodeal: '',
+//     beginDate: 20210101,
+//     endDate: 20210131,
+//     fcheckState: '',
+//     orderbyfield: 'fpostchecktask_uuid',
+//   },
+//   formatResult: res => {
+//     return {
+//       list: res.rows.map((r, i) => ({ ...r, key: i })),
+//       total: res.total,
+//     };
+//   },
+// };
 
 export default () => {
   return (
@@ -245,9 +217,9 @@ export default () => {
         <MenHeyTable
           buttons={tableButtons}
           columns={tableHeaders}
-          dataSource={remoteOption}
-          paginated={true}
-          rowKey="fpostchecktask_uuid"
+          remote={remoteOption}
+          //paginated={true}
+          rowKey="fcourseware_uuid"
           rowSelection="radio"
         />
       </div>

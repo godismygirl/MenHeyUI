@@ -3,13 +3,13 @@ import {
   Form,
   Input,
   InputNumber,
-  Select,
   Switch,
   Radio,
   Checkbox,
   DatePicker,
   TimePicker,
 } from 'antd';
+import MenHeySelect from '../Select';
 
 const renderWidget = (field, form) => {
   const { name, label, initialValue, rules, onChange, ...restProps } = field;
@@ -46,7 +46,7 @@ const renderWidget = (field, form) => {
 
     case 'select':
       {
-        return <Select onChange={onValueChange} {...restProps} />;
+        return <MenHeySelect onChange={onValueChange} {...restProps} />;
       }
       break;
 

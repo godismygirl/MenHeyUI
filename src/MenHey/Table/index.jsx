@@ -1,16 +1,28 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Table, Button, Tooltip, Pagination, Space } from 'antd';
+import {
+  Table,
+  Button,
+  Tooltip,
+  Pagination,
+  Space,
+  Modal,
+  message,
+} from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { useRequest, request } from 'umi';
+import { getService } from '../utils';
+import MenHeyModalForm, { useMenHeyModalForm } from '../ModalForm';
 import style from './style.less';
 
 const MenHeyTable = ({
   columns,
   rowKey = 'id',
   rowSelection,
-  paginated,
-  dataSource,
+  paginated = true,
+  remote,
   buttons,
 }) => {
+  const modalForm = useMenHeyModalForm();
   const headerColumns = useMemo(
     () =>
       columns.map(col => {
@@ -38,7 +50,7 @@ const MenHeyTable = ({
     currentAlias,
     pageSizeAlias,
     formatResult,
-  } = dataSource;
+  } = remote;
 
   const service = ({ current, pageSize }) => {
     const isGet = method.toUpperCase() === 'GET';
@@ -65,15 +77,77 @@ const MenHeyTable = ({
     formatResult: formatResult ? formatResult : res => res,
   });
 
-  const [selectRows, setSelectRows] = useState([]);
+  const [currentSelectRows, setCurrentSelectRows] = useState([]);
   const rowSelectionOption = rowSelection && {
     type: rowSelection,
     onChange: (selectedRowKeys, selectedRows) => {
-      setSelectRows(selectedRows);
+      setCurrentSelectRows(selectedRows);
     },
     getCheckboxProps: record => ({
-      defaultChecked: !!selectRows.find(row => row[rowKey] === record[rowKey]),
+      defaultChecked: !!currentSelectRows.find(
+        row => row[rowKey] === record[rowKey],
+      ),
     }),
+  };
+
+  const onAction = action => {
+    const { remote, type, title, content } = action;
+    console.log(currentSelectRows);
+    if (currentSelectRows.length === 0) {
+      message.error('请选中一行进行操作');
+      return;
+    }
+
+    const service = getService(remote);
+    switch (type) {
+      case 'confirm':
+        {
+          console.log(currentSelectRows);
+          Modal.confirm({
+            title,
+            icon: <ExclamationCircleOutlined />,
+            content,
+            okText: '确定',
+            okType: 'danger',
+            cancelText: '取消',
+            onOk: async () => {
+              const res = await service({
+                [rowKey]: currentSelectRows[0][rowKey],
+              });
+              if (res.code === '1') {
+                message.success(res.desc);
+                refresh();
+              } else {
+                message.error(res.desc);
+              }
+            },
+          });
+        }
+        break;
+
+      case 'modalform':
+        {
+          const chosen = currentSelectRows[0];
+          if (action.showInitialValues) {
+            action.fields.map(el => (el.initialValue = chosen[el.name]));
+          }
+          action.remote.params = { [rowKey]: chosen[rowKey] };
+          modalForm.setConfig(action);
+          modalForm.show();
+        }
+        break;
+
+      default: {
+        service({ [rowKey]: currentSelectRows[0][rowKey] }).then(res => {
+          if (res.code === '1') {
+            message.success(res.desc);
+            refresh();
+          } else {
+            message.error(res.desc);
+          }
+        });
+      }
+    }
   };
 
   return (
@@ -81,15 +155,15 @@ const MenHeyTable = ({
       {buttons && (
         <div className={style.action}>
           <Space>
-            {buttons.map((btn, i) => (
+            {buttons.map((config, i) => (
               <Button
                 key={`btn${i}`}
-                type={btn.type}
-                icon={btn.icon}
-                danger={btn.danger}
-                //onClick={btn.onClick.bind(null, form)}
+                type={config.type}
+                icon={config.icon}
+                danger={config.danger}
+                onClick={onAction.bind(null, config.action)}
               >
-                {btn.text}
+                {config.text}
               </Button>
             ))}
           </Space>
@@ -109,6 +183,7 @@ const MenHeyTable = ({
       <div className={style.pager}>
         <Pagination {...pagination} />
       </div>
+      <MenHeyModalForm {...modalForm.config} onSuccess={refresh} />
     </div>
   );
 };
