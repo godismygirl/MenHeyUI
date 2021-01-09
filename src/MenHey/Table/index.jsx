@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useRef, useState, useMemo } from 'react';
 import {
   Table,
   Button,
@@ -11,18 +11,18 @@ import {
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { useRequest, request } from 'umi';
 import { getService } from '../utils';
-import MenHeyModalForm, { useMenHeyModalForm } from '../ModalForm';
+import MenHeyModalForm from '../ModalForm';
 import style from './style.less';
 
 const MenHeyTable = ({
-  columns,
+  columns = [],
   rowKey = 'id',
   rowSelection,
   paginated = true,
   remote,
-  buttons,
+  buttons = [],
 }) => {
-  const modalForm = useMenHeyModalForm();
+  const modalFormRef = useRef();
   const headerColumns = useMemo(
     () =>
       columns.map(col => {
@@ -43,38 +43,15 @@ const MenHeyTable = ({
     [],
   );
 
-  const {
-    url,
-    method = 'GET',
-    params,
-    currentAlias,
-    pageSizeAlias,
-    formatResult,
-  } = remote;
-
-  const service = ({ current, pageSize }) => {
-    const isGet = method.toUpperCase() === 'GET';
-    const requestParams = isGet ? 'params' : 'data';
-    const aliasCurrent = currentAlias || 'current';
-    const aliasPageSize = pageSizeAlias || 'pageSize';
-    return request(url, {
-      headers: { 'Cache-Control': 'no-cache', Pragma: 'no-cache' },
-      method: method,
-      [requestParams]: {
-        ...params,
-        [aliasCurrent]: current,
-        [aliasPageSize]: pageSize,
-      },
-    });
-  };
+  const service = getService(remote);
 
   const { data, loading, pagination, refresh } = useRequest(service, {
     //pollingInterval: 10000,
     debounceInterval: 500,
     //manual: true,
     paginated,
-    refreshDeps: [params],
-    formatResult: formatResult ? formatResult : res => res,
+    refreshDeps: [remote.params],
+    formatResult: remote.formatResult ? remote.formatResult : res => res,
   });
 
   const [currentSelectRows, setCurrentSelectRows] = useState([]);
@@ -90,13 +67,10 @@ const MenHeyTable = ({
     }),
   };
 
+  const [modalFormConfig, setModalFormConfig] = useState();
+
   const onAction = action => {
     const { remote, type, title, content } = action;
-    console.log(currentSelectRows);
-    if (currentSelectRows.length === 0) {
-      message.error('请选中一行进行操作');
-      return;
-    }
 
     const service = getService(remote);
     switch (type) {
@@ -125,15 +99,27 @@ const MenHeyTable = ({
         }
         break;
 
+      case 'add':
+        {
+          setModalFormConfig(action);
+          modalFormRef.current.show();
+        }
+        break;
+
       case 'modalform':
         {
           const chosen = currentSelectRows[0];
+          if (!chosen) {
+            message.error('请选中一行进行操作');
+            return;
+          }
           if (action.showInitialValues) {
             action.fields.map(el => (el.initialValue = chosen[el.name]));
           }
           action.remote.params = { [rowKey]: chosen[rowKey] };
-          modalForm.setConfig(action);
-          modalForm.show();
+          //modalFormRef.current.setConfig(action);
+          setModalFormConfig(action);
+          modalFormRef.current.show();
         }
         break;
 
@@ -183,15 +169,13 @@ const MenHeyTable = ({
       <div className={style.pager}>
         <Pagination {...pagination} />
       </div>
-      <MenHeyModalForm {...modalForm.config} onSuccess={refresh} />
+      <MenHeyModalForm
+        {...modalFormConfig}
+        ref={modalFormRef}
+        onActionSuccess={refresh}
+      />
     </div>
   );
-};
-
-MenHeyTable.defaultProps = {
-  columns: [],
-  dataSource: [],
-  buttons: [],
 };
 
 export default React.memo(MenHeyTable);

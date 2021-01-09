@@ -1,8 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { Form, Row, Col, Button } from 'antd';
 import renderFormItem from './renderFormItem';
-import useMenHeyForm from './store';
-import style from './style.less';
+import styles from './styles.less';
 
 const MenHeyForm = ({
   layout = 'horizontal',
@@ -39,8 +38,8 @@ const MenHeyForm = ({
 
   return React.useMemo(
     () => (
-      <div className={style.wrapper}>
-        <div className={style.content}>
+      <div className={styles.wrapper}>
+        <div className={styles.content}>
           <Form
             form={form}
             layout={layout}
@@ -56,7 +55,7 @@ const MenHeyForm = ({
             </Row>
           </Form>
         </div>
-        <div className={style.action}>
+        <div className={styles.action}>
           {buttons.map((btn, i) => (
             <Button
               key={`btn${i}`}
@@ -84,4 +83,3 @@ MenHeyForm.defaultProps = {
 };
 
 export default MenHeyForm;
-export { useMenHeyForm };

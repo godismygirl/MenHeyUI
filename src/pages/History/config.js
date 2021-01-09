@@ -1,3 +1,55 @@
+import { SearchOutlined, ReloadOutlined, TagOutlined } from '@ant-design/icons';
+export const fieldConfig = [
+  {
+    type: 'input',
+    name: 'ftitle',
+    label: '标题',
+    placeholder: '请输入标题',
+    //rules: [{ required: true, message: '部门id必填' }],
+  },
+  {
+    type: 'select',
+    labelField: 'text',
+    valueField: 'id',
+    remote: {
+      url: '/API/wdk?action=obj.traincou&method=fis_active',
+    },
+    name: 'fcourseware_type_uuid',
+    label: '类型',
+    allowClear: true,
+    label: '是否启用',
+  },
+];
+
+export const buttonConfig = [
+  {
+    text: '立即查询',
+    icon: <SearchOutlined />,
+    type: 'primary',
+    onClick: form => {
+      console.log('form', form);
+      form.validateFields().then(values => {
+        //
+      });
+    },
+  },
+  {
+    //text: '重置',
+    icon: <ReloadOutlined />,
+    //type: 'reset',
+    danger: true,
+    onClick: form => {
+      form.resetFields();
+    },
+  },
+  {
+    text: '取消',
+    onClick: form => {
+      console.log('form', form);
+    },
+  },
+];
+
 export const tableHeaders = [
   {
     title: '标题',
@@ -66,7 +118,7 @@ export const tableButtons = [
     //icon: <ReloadOutlined />,
     type: 'primary',
     action: {
-      type: 'modalform',
+      type: 'add',
       title: '新增课件',
       okText: '确定',
       fields: [
